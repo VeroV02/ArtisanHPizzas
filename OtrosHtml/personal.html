@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artisan Hearth - Personal de Cocina</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;0,8..60,700;1,8..60,600&family=Rammetto+One&family=Asap+Sharp:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Colores de superficie */
+      --surface: #1C1917;
+      --surface-container: #262220;
+      --surface-card: #2E2927;
+      --surface-card-alt: #332D2A;
+      --surface-hover: #3A3432;
+
+      /* Acentos */
+      --title-accent: #E8703F;
+      --primary: #C84B2C;
+      --primary-hover: #E05634;
+      --primary-light: #421D16;
+      --primary-text: #FF9E88;
+
+      --secondary: #567C52;
+      --secondary-hover: #699764;
+      --secondary-light: #1E331C;
+      --secondary-text: #A7E09E;
+
+      --tertiary: #E8A838;
+      --tertiary-light: #3D2D13;
+      --tertiary-text: #FFD285;
+
+      /* Tipografía y bordes */
+      --charcoal: #F5F2F0;
+      --text-muted: #C4B6B0;
+      --text-faint: #8F827C;
+      --stone-border: #443D3A;
+      --stone-border-soft: #3A332F;
+
+      /* Fuentes */
+      --font-headline: "Rammetto One", sans-serif;
+      --font-body: "Asap Sharp", sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Radios */
+      --radius-sm: 0.375rem;
+      --radius-default: 0.625rem;
+      --radius-lg: 1.25rem;
+      --radius-xl: 1.75rem;
+      --radius-full: 9999px;
+
+      /* Espaciado */
+      --spacing-gutter: 28px;
+      --spacing-margin: 44px;
+      --stack-sm: 12px;
+      --stack-md: 22px;
+      --stack-lg: 36px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--surface);
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(200, 75, 44, 0.07), transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(86, 124, 82, 0.05), transparent 35%);
+      color: var(--charcoal);
+      font-family: var(--font-body);
+      font-optical-sizing: auto;
+      font-variation-settings: "wdth" 100;
+      font-size: 16px;
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ==========================================================================
+       SIDEBAR
+       ========================================================================== */
+    .sidebar {
+      width: 84px;
+      background-color: var(--surface-container);
+      border-right: 1px solid var(--stone-border);
+      padding: 30px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      top: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+      white-space: nowrap;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.28);
+    }
+
+    .sidebar:hover,
+    .sidebar.expanded {
+      width: 272px;
+      padding: 30px 22px;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .logo-mark {
+      min-width: 40px;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-default);
+      background: linear-gradient(155deg, var(--primary) 0%, var(--title-accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-headline);
+      font-size: 17px;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(200, 75, 44, 0.35);
+    }
+
+    .brand-info {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    }
+
+    .sidebar:hover .brand-info,
+    .sidebar.expanded .brand-info {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .brand-title {
+      font-family: var(--font-headline);
+      font-size: 22px;
+      color: var(--title-accent);
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-subtitle {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-faint);
+      letter-spacing: 0.03em;
+      margin-top: 3px;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item {
+      border-radius: var(--radius-default);
+      font-weight: 500;
+      font-size: 15px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      user-select: none;
+    }
+
+    .nav-item a, .nav-item.active {
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-radius: var(--radius-default);
+      width: 100%;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      min-width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .nav-text {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      font-size: 14.5px;
+    }
+
+    .sidebar:hover .nav-text,
+    .sidebar.expanded .nav-text {
+      opacity: 1;
+    }
+
+    .nav-item.active { background-color: var(--primary-light); color: var(--primary-text); }
+    .nav-item:hover:not(.active) { background-color: var(--surface-hover); color: var(--charcoal); }
+
+    .badge-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      background-color: var(--secondary-light);
+      color: var(--secondary-text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid rgba(86, 124, 82, 0.4);
+    }
+
+    .badge-status .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--secondary-text);
+      flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(167, 224, 158, 0.18);
+    }
+
+    .badge-status .status-text {
+      display: none;
+      white-space: nowrap;
+    }
+
+    .sidebar:hover .badge-status .status-text,
+    .sidebar.expanded .badge-status .status-text {
+      display: inline;
+    }
+
+    /* ==========================================================================
+       LAYOUT PRINCIPAL
+       ========================================================================== */
+    .main-content {
+      margin-left: 84px;
+      flex: 1;
+      padding: var(--spacing-margin);
+      max-width: 1560px;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body.sidebar-locked .main-content { margin-left: 272px; }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: var(--stack-lg);
+      flex-wrap: wrap;
+    }
+
+    .main-title {
+      font-family: var(--font-headline);
+      font-size: 32px;
+      color: var(--title-accent);
+      letter-spacing: 0.01em;
+      line-height: 1.15;
+    }
+
+    .main-subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-top: 8px;
+      max-width: 52ch;
+    }
+
+    /* ==========================================================================
+       KPI RESUMEN
+       ========================================================================== */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--spacing-gutter);
+      margin-bottom: var(--stack-lg);
+    }
+
+    .kpi-card {
+      background-color: var(--surface-card);
+      border: 1px solid var(--stone-border);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--kpi-accent, var(--primary));
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1.2;
+    }
+
+    .kpi-foot {
+      font-size: 12.5px;
+      color: var(--text-faint);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       GRID Y TARJETAS
+       ========================================================================== */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--spacing-gutter);
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8  { grid-column: span 8; }
+    .col-4  { grid-column: span 4; }
+
+    .card {
+      background-color: var(--surface-card);
+      border: 1px solid var(--stone-border);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      box-shadow: 0px 10px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .card-header {
+      font-family: var(--font-headline);
+      font-size: 22px;
+      line-height: 30px;
+      margin-bottom: 6px;
+      color: var(--title-accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .card-subtext {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: var(--stack-md);
+      max-width: 62ch;
+    }
+
+    /* Botones */
+    .btn {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-default);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-primary { background-color: var(--primary); color: #ffffff; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-secondary {
+      background-color: transparent;
+      border-color: var(--stone-border);
+      color: var(--charcoal);
+    }
+    .btn-secondary:hover { background-color: var(--surface-hover); }
+
+    .btn-ghost { background-color: transparent; color: var(--secondary-text); }
+    .btn-ghost:hover { background-color: var(--secondary-light); }
+
+    .btn-sm { padding: 7px 13px; font-size: 13px; }
+    .btn-block { width: 100%; justify-content: center; }
+
+    /* Badges */
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-alert   { background-color: var(--primary-light); color: var(--primary-text); border: 1px solid rgba(200, 75, 44, 0.4); }
+    .badge-success { background-color: var(--secondary-light); color: var(--secondary-text); border: 1px solid rgba(86, 124, 82, 0.4); }
+    .badge-warning { background-color: var(--tertiary-light); color: var(--tertiary-text); border: 1px solid rgba(232, 168, 56, 0.4); }
+
+    /* Tablas */
+    .table-scroll { overflow-x: auto; }
+
+    .data-table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: separate;
+      border-spacing: 0;
+      text-align: left;
+    }
+
+    .data-table th {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 13px 18px;
+      background-color: var(--surface-container);
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--stone-border);
+    }
+
+    .data-table th:first-child { border-top-left-radius: var(--radius-default); }
+    .data-table th:last-child  { border-top-right-radius: var(--radius-default); }
+
+    .data-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--stone-border-soft);
+      font-size: 14.5px;
+    }
+
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background-color: var(--surface-hover); }
+
+    .cell-mono { font-family: var(--font-mono); font-weight: 500; }
+    .cell-muted { color: var(--text-muted); }
+
+    /* Perfil de empleado */
+    .staff-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      border-radius: var(--radius-full);
+      background-color: var(--primary-light);
+      color: var(--primary-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13.5px;
+      font-family: var(--font-mono);
+    }
+
+    .avatar.avatar-secondary { background-color: var(--secondary-light); color: var(--secondary-text); }
+    .avatar.avatar-tertiary  { background-color: var(--tertiary-light); color: var(--tertiary-text); }
+    .avatar.avatar-neutral   { background-color: var(--surface-container); color: var(--text-muted); }
+
+    .staff-name { font-weight: 600; font-size: 14.5px; }
+    .staff-id { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
+
+    /* Panel de turnos */
+    .shift-card {
+      border: 1px solid var(--stone-border);
+      border-radius: var(--radius-default);
+      padding: 18px;
+      margin-bottom: 14px;
+      background-color: var(--surface-container);
+    }
+
+    .shift-card.shift-active { border-color: var(--primary); background-color: var(--primary-light); }
+
+    .shift-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14.5px;
+    }
+
+    .shift-header.shift-header-active { color: var(--primary-text); }
+
+    .shift-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       RESPONSIVE
+       ========================================================================== */
+    @media (max-width: 1100px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .col-8, .col-4 { grid-column: span 12; }
+    }
+
+    @media (max-width: 640px) {
+      .sidebar { width: 64px; padding: 20px 10px; }
+      .sidebar:hover, .sidebar.expanded { width: 240px; }
+      .main-content { margin-left: 64px; padding: 24px 18px; }
+      body.sidebar-locked .main-content { margin-left: 240px; }
+      .kpi-row { grid-template-columns: 1fr; }
+      .main-title { font-size: 26px; }
+      .card { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div class="sidebar-header" onclick="toggleSidebarLock()">
+        <div class="logo-mark">AH</div>
+        <div class="brand-info">
+          <div class="brand-title">Artisan Hearth</div>
+          <div class="brand-subtitle">Pizzeria Management</div>
+        </div>
+      </div>
+
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="../index.html#/">
+            <span class="nav-icon">📊</span><span class="nav-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="../index.html#/ventas">
+            <span class="nav-icon">🍕</span><span class="nav-text">Platillos & Ventas</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="../index.html#/inventario">
+            <span class="nav-icon">📦</span><span class="nav-text">Inventario & Stock</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a href="../index.html#/personal">
+            <span class="nav-icon">👥</span><span class="nav-text">Personal de Cocina</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="../index.html#/configuracion">
+            <span class="nav-icon">⚙️</span><span class="nav-text">Configuración</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="badge-status">
+      <span class="status-dot"></span>
+      <span class="status-text">Turno Noche (18:00 - 00:00)</span>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-content">
+
+    <header class="header-bar">
+      <div>
+        <h1 class="main-title">Personal de Cocina</h1>
+        <p class="main-subtitle">Asignación de turnos, estaciones de trabajo y rendimiento de la brigada.</p>
+      </div>
+      <button class="btn btn-primary" onclick="alert('Abriendo formulario para registrar nuevo empleado...')">➕ Registrar Personal</button>
+    </header>
+
+    <section class="kpi-row">
+      <div class="kpi-card" style="--kpi-accent: var(--secondary);">
+        <span class="kpi-label">Personal Activo Hoy</span>
+        <span class="kpi-value">8 / 10</span>
+        <span class="kpi-foot">👥 2 con descanso programado</span>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--primary);">
+        <span class="kpi-label">Carga de Trabajo Promedio</span>
+        <span class="kpi-value" style="color: var(--primary-text);">85%</span>
+        <span class="kpi-foot">⚠️ Cerca del límite operativo</span>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--tertiary);">
+        <span class="kpi-label">Tiempo Promedio por Orden</span>
+        <span class="kpi-value">12 min</span>
+        <span class="kpi-foot">⏱ Meta interna: 10 min</span>
+      </div>
+      <div class="kpi-card" style="--kpi-accent: var(--secondary);">
+        <span class="kpi-label">Estación Más Concurrida</span>
+        <span class="kpi-value" style="font-size: 19px;">🥣 Preparación</span>
+        <span class="kpi-foot">Considera reforzar apoyo aquí</span>
+      </div>
+    </section>
+
+    <div class="grid-container">
+
+      <!-- Tabla Principal de Empleados -->
+      <section class="card col-8">
+        <div class="card-header">
+          <span>Directorio y Estado de Brigada</span>
+          <button class="btn btn-secondary btn-sm" onclick="alert('Filtrando personal...')">🔍 Filtrar</button>
+        </div>
+        <p class="card-subtext">Estado actual de cada integrante y su estación asignada en el turno.</p>
+
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Empleado</th>
+                <th>Puesto / Especialidad</th>
+                <th>Estación Actual</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="staff-profile">
+                    <div class="avatar">MR</div>
+                    <div>
+                      <div class="staff-name">Marco Rossi</div>
+                      <div class="staff-id">ID: #EMP-01</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="cell-muted">Pizzaiolo Líder</td>
+                <td class="cell-muted">🔥 Horno principal</td>
+                <td><span class="badge badge-success">Activo</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="alert('Modificando estación de Marco Rossi...')">Gestionar</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="staff-profile">
+                    <div class="avatar avatar-secondary">CM</div>
+                    <div>
+                      <div class="staff-name">Carlos Mendoza</div>
+                      <div class="staff-id">ID: #EMP-02</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="cell-muted">Especialista en Masas</td>
+                <td class="cell-muted">🥣 Masa y Prep 1</td>
+                <td><span class="badge badge-alert">Saturado</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="alert('Enviando ayuda a Carlos Mendoza...')">Dar Apoyo</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="staff-profile">
+                    <div class="avatar avatar-tertiary">ST</div>
+                    <div>
+                      <div class="staff-name">Sofía Torres</div>
+                      <div class="staff-id">ID: #EMP-03</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="cell-muted">Asistente de Cocina</td>
+                <td class="cell-muted">🔥 Horno Auxiliar</td>
+                <td><span class="badge badge-success">Activo</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="alert('Modificando estación de Sofía Torres...')">Gestionar</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="staff-profile">
+                    <div class="avatar">LG</div>
+                    <div>
+                      <div class="staff-name">Lucía Gómez</div>
+                      <div class="staff-id">ID: #EMP-04</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="cell-muted">Ayudante General</td>
+                <td class="cell-muted">🥣 Masa y Prep 2</td>
+                <td><span class="badge badge-success">Activo</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="alert('Modificando estación de Lucía Gómez...')">Gestionar</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="staff-profile">
+                    <div class="avatar avatar-neutral">JP</div>
+                    <div>
+                      <div class="staff-name">Javier Peña</div>
+                      <div class="staff-id">ID: #EMP-05</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="cell-muted">Control de Calidad</td>
+                <td class="cell-muted">📦 Empaque & Salida</td>
+                <td><span class="badge badge-warning">Carga Baja</span></td>
+                <td><button class="btn btn-secondary btn-sm" onclick="alert('Reasignando a Javier Peña...')">Reasignar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Panel de Turnos y Programación -->
+      <section class="card col-4">
+        <div class="card-header">
+          <span>Programación de Turnos</span>
+          <button class="btn btn-ghost btn-sm" onclick="alert('Abriendo calendario completo...')">Ver Agenda</button>
+        </div>
+        <p class="card-subtext">Cobertura de personal por franja horaria.</p>
+
+        <div class="shift-card">
+          <div class="shift-header">
+            <span>Turno Tarde (12:00 - 18:00)</span>
+            <span class="badge badge-success">Completado</span>
+          </div>
+          <p class="shift-meta">4 empleados asignados</p>
+        </div>
+
+        <div class="shift-card shift-active">
+          <div class="shift-header shift-header-active">
+            <span>Turno Noche (18:00 - 00:00)</span>
+            <span class="badge badge-alert">En Curso</span>
+          </div>
+          <p class="shift-meta">5 empleados asignados (1 supervisor)</p>
+        </div>
+
+        <div class="shift-card">
+          <div class="shift-header">
+            <span>Turno Mañana (08:00 - 14:00)</span>
+            <span class="badge badge-warning">Pendiente</span>
+          </div>
+          <p class="shift-meta">3 empleados confirmados</p>
+        </div>
+
+        <button class="btn btn-secondary btn-block" onclick="alert('Generando distribución automática de turnos...')">
+          📅 Reorganizar Turnos
+        </button>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    function toggleSidebarLock() {
+      const sidebar = document.getElementById('sidebar');
+      const body = document.body;
+      sidebar.classList.toggle('expanded');
+      body.classList.toggle('sidebar-locked');
+    }
+  </script>
+</body>
+</html>
